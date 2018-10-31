@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Weather</title>
+    <style>
+        #output {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Weather App</h1>
+    <label for="city">Please enter A City and Country Code no spaces, comma seperated: (example: London,uk)
+        <br>
+        <input type="text" name="city" id="city" />
+    </label>
+    <button onClick="Run()">Get Weather</button>
+    <div id="output"></div>
+    <script type="text/javascript">
+        function Run() {
+            var city = document.getElementById("city").value
+            const url = `http://api.openweathermap.org/data/2.5/forecast?q=${city}&APPID=5cf28009ba2510ffe7b0bad2ce535148`;
+            fetch(url)
+                .then(response => response.json())
+                .then(function (json) {
+                    var maindata = json.list[0];
+                    console.log(maindata)
+                    let currentTempF = ((maindata.main.temp - 273.15) * 1.8) + 32
+                    let highTempF = ((maindata.main.temp_max - 273.15) * 1.8) + 32
+                    let lowTempF = ((maindata.main.temp_min - 273.15) * 1.8) + 32
+                    let cloudMessage;
+                    if (maindata.clouds.all < 25) {
+                        cloudMessage = "clear skies"
+                    } else if (maindata.clouds.all < 70) {
+                        cloudMessage = "partly cloudy skies"
+                    } else {
+                        cloudMessage = "cloudy skies"
+                    }
+                    document.querySelector('#output').innerHTML = `In ${city}, it is currently ${Math.round(currentTempF)} degrees with a high of ${Math.ceil(highTempF)} and a low of ${Math.round(lowTempF)} with ${cloudMessage}`
+                })
+                .catch(function (error) {
+                    console.log(error)
+                    alert("Please enter valid format of no spaces, comma seperated (example: London,uk)")
+                })
+        }
+    </script>
+</body>
+
+</html>

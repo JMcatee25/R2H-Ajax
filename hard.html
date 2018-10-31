@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>ISS location</title>
+    <style>
+        #output {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <label for="coords">Please enter some Coordinates:
+        <form id="coords" name="coords">
+            <label for="lat">Latitude:
+                <input type="text" name="lat" id="lat" />
+            </label>
+            <label for="lon">Longitude:
+                <input type="text" name="lon" id="lon" />
+            </label>
+            <input type="submit" value="submit">
+        </form>
+        <button onclick="getLocation()">Use current location</button>
+    </label>
+    <div id="output"></div>
+    <script type="text/javascript">
+        var lon = document.getElementById("lon");
+        var lat = document.getElementById("lat");
+        var output = document.getElementById("output");
+        var myForm = document.getElementById("coords")
+
+        myForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+            Run();
+        })
+
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(setPosition);
+            } else {
+                output.innerHTML = "Geolocation is not supported by this browser.";
+            }
+        }
+
+        function setPosition(position) {
+            lat.value = position.coords.latitude;
+            lon.value = position.coords.longitude;
+            Run();
+        }
+
+        function Run() {
+            const url = `http://api.open-notify.org/iss-pass.json?lat=${lat.value}&lon=${lon.value}`;
+            fetch(url)
+                .then(response => response.json())
+                .then(function (json) {
+                    for (var x = 0; x < json.response.length; x++) {
+                        duration = json.response[x].duration
+                        date = new Date(json.response[x].risetime * 1000)
+                        output.innerHTML += `The ISS will pass over {${lat.value}, ${lon.value}} for ${duration} seconds on ${date}<br>`
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error)
+                    alert("Please enter a correct longitude and latitude")
+                })
+        }
+    </script>
+</body>
+
+</html>
